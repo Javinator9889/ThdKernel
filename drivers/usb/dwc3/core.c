@@ -36,6 +36,7 @@
 #include <linux/acpi.h>
 #include <linux/pinctrl/consumer.h>
 #include <linux/irq.h>
+#include <linux/errno.h>
 
 #include <linux/usb/ch9.h>
 #include <linux/usb/gadget.h>
@@ -1318,6 +1319,28 @@ static int dwc3_probe(struct platform_device *pdev)
 	pm_runtime_enable(dev);
 	pm_runtime_forbid(dev);
 
+	ret = dwc3_alloc_event_buffers(dwc, DWC3_EVENT_BUFFERS_SIZE);
+	if (ret) {
+		dev_err(dwc->dev, "failed to allocate event buffers\n");
+		ret = -ENOMEM;
+		goto err2;
+	}
+
+	ret = dwc3_get_dr_mode(dwc);
+	if (ret)
+		goto err3;
+
+	ret = dwc3_alloc_scratch_buffers(dwc);
+	if (ret)
+		goto err3;
+
+	ret = dwc3_core_init(dwc);
+	if (ret) {
+		if (ret != -EPROBE_DEFER)
+			dev_err(dev, "failed to initialize core: %d\n", ret);
+		goto err4;
+	}
+
 	/* Check the maximum_speed parameter */
 	switch (dwc->maximum_speed) {
 	case USB_SPEED_LOW:
@@ -1378,7 +1401,22 @@ static int dwc3_probe(struct platform_device *pdev)
 err_core_init:
 	dwc3_core_exit_mode(dwc);
 
+err5:
+	dwc3_event_buffers_cleanup(dwc);
+
+err4:
+	dwc3_free_scratch_buffers(dwc);
+
+err3:
+	dwc3_free_event_buffers(dwc);
+	dwc3_ulpi_exit(dwc);
+
+err2:
+	pm_runtime_allow(&pdev->dev);
+
 err1:
+	pm_runtime_put_sync(&pdev->dev);
+	pm_runtime_disable(&pdev->dev);
 	destroy_workqueue(dwc->dwc_wq);
 err0:
 	/*
