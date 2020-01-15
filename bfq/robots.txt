@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /people/mauro/dida/2013-14_ASD/materiale/
+Disallow: /people/mauro/dida/2014-15_ASD/materiale/
+Disallow: /people/mauro/dida/2015-16_ASD/materiale/
