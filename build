@@ -22,6 +22,8 @@ KV=$(make kernelversion)
 
 echo "Preparing for compiling kernel ThdKernel-${KV}..."
 
+mkdir -p out
+
 make -s clean
 make -s mrproper
 
@@ -29,6 +31,10 @@ make -s O=out clean
 make -s O=out mrproper
 
 rm -rf out/zFile
+
+touch .scmversion
+
+touch out/.scmversion
 
 # Time measurement
 # UNIX timestamp concatenated with nanoseconds
