@@ -11,8 +11,6 @@
  * GNU General Public License for more details.
  */
 
-/dts-v1/;
-
 #include "msm8953.dtsi"
 #include "pmi8950.dtsi"
 #include "msm8953-pmi8950.dtsi"
