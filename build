@@ -10,17 +10,17 @@ echo "                                                ";
 echo "                                                ";
 echo "                                                ";
 
-# read -p "Build profile kernel? [Y/n] " ENABLE_PROFILE
+read -p "Build the kernel using LTO? [y/n] " LTOS
 
-# if [ "${ENABLE_PROFILE}" == "y" ]; then
-#    KERNEL_CONFIG="thdkernel-prof_defconfig"
-# else
-#    KERNEL_CONFIG="thdkernel_defconfig"
-#fi
+if [ "${LTOS}" == "y" ]; then
+   KERNEL_CONFIG="thdkernel_defconfig"
+else
+   KERNEL_CONFIG="thdkernel-nlto_defconfig"
+fi
 
 KV=$(make kernelversion)
 
-echo "Preparing for compiling kernel v${KV}..."
+echo "Preparing for compiling kernel ThdKernel-${KV}..."
 
 make -s clean
 make -s mrproper
@@ -35,7 +35,7 @@ rm -rf out/zFile
 T="$(date +%s%N)"
 
 # Compilation process
-make -j$(nproc --all) O=out ARCH=arm64 CC=clang HOSTCC=clang CLANG_TRIPLE=aarch64-linux-android CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CFLAGS="-target aarch64-linux-android -fPIC" distclean tissot_defconfig all # ${KERNEL_CONFIG}
+make -j$(nproc --all) O=out ARCH=arm64 CC=clang HOSTCC=clang CLANG_TRIPLE=aarch64-linux-android CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CFLAGS="-target aarch64-linux-android -fPIC" distclean ${KERNEL_CONFIG} all
 
 RT=$?
 
