@@ -227,7 +227,7 @@ struct kparam_array
 /* Obsolete - use module_param_cb() */
 #define module_param_call(name, set, get, arg, perm)			\
 	static const struct kernel_param_ops __param_ops_##name =	\
-		{ .flags = 0, (void *)set, (void *)get };		\
+		{ .flags = 0, .set = (void *)set, .get = (void *)get };		\
 	__module_param_call(MODULE_PARAM_PREFIX,			\
 			    name, &__param_ops_##name, arg, perm, -1, 0)
 
