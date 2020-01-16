@@ -828,7 +828,7 @@ exit:
 }
 #endif /* CONFIG_TOUCHSCREEN_CYPRESS_CYTTSP5_BINARY_FW_UPGRADE */
 
-#ifdef CYTTSP5_TTCONFIG_UPGRADE
+#ifdef CONFIG_TOUCHSCREEN_CYPRESS_CYTTSP5_MANUAL_TTCONFIG_UPGRADE
 static int cyttsp5_write_config_row_(struct device *dev, u8 ebid,
 		u16 row_number, u16 row_size, u8 *data)
 {
@@ -969,9 +969,7 @@ exit:
 
 	return rc;
 }
-#endif /* CYTTSP5_TTCONFIG_UPGRADE */
 
-#ifdef CONFIG_TOUCHSCREEN_CYPRESS_CYTTSP5_PLATFORM_TTCONFIG_UPGRADE
 static int cyttsp5_get_ttconfig_crc(struct device *dev,
 		const u8 *ttconfig_data, int ttconfig_size, u16 *crc)
 {

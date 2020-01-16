@@ -760,7 +760,7 @@ static int check_input_term(struct mixer_build *state, int id,
 			} else { /* UAC_VERSION_3 */
 				struct uac3_input_terminal_descriptor *d = p1;
 
-				err = check_input_term(state,
+				err = __check_input_term(state,
 							d->bCSourceID, term);
 				if (err < 0)
 					return err;
@@ -791,7 +791,17 @@ static int check_input_term(struct mixer_build *state, int id,
 			term->name = uac_mixer_unit_iMixer(d);
 			return 0;
 		}
-		case UAC_SELECTOR_UNIT:
+		case UAC_SELECTOR_UNIT: {
+			struct uac_selector_unit_descriptor *d = p1;
+			/* call recursively to retrieve the channel info */
+			err = __check_input_term(state, d->baSourceID[0], term);
+			if (err < 0)
+				return err;
+			term->type = d->bDescriptorSubtype << 16; /* virtual type */
+			term->id = id;
+			term->name = uac_selector_unit_iSelector(d);
+			return 0;
+		}
 		/* UAC3_MIXER_UNIT_V3 */
 		case UAC2_CLOCK_SELECTOR:
 		/* UAC3_CLOCK_SOURCE */ {
@@ -818,7 +828,7 @@ static int check_input_term(struct mixer_build *state, int id,
 			} else {
 				struct uac_selector_unit_descriptor *d = p1;
 				/* call recursively to retrieve channel info */
-				err = check_input_term(state,
+				err = __check_input_term(state,
 							d->baSourceID[0], term);
 				if (err < 0)
 					return err;
