@@ -9110,9 +9110,9 @@ static int nl80211_setdel_pmksa(struct sk_buff *skb, struct genl_info *info)
 		pmksa.pmk_len = nla_len(info->attrs[NL80211_ATTR_PMK]);
 	}
 
-	if (dev->ieee80211_ptr->iftype != NL80211_IFTYPE_STATION &&
-	    dev->ieee80211_ptr->iftype != NL80211_IFTYPE_P2P_CLIENT &&
-	    !(dev->ieee80211_ptr->iftype == NL80211_IFTYPE_AP &&
+	if ((dev->ieee80211_ptr->iftype != NL80211_IFTYPE_STATION) &&
+	    (dev->ieee80211_ptr->iftype != NL80211_IFTYPE_P2P_CLIENT) &&
+	    !((dev->ieee80211_ptr->iftype == NL80211_IFTYPE_AP) &&
 	      wiphy_ext_feature_isset(&rdev->wiphy,
 				      NL80211_EXT_FEATURE_AP_PMKSA_CACHING)))
 		return -EOPNOTSUPP;
@@ -12100,8 +12100,8 @@ static int nl80211_external_auth(struct sk_buff *skb, struct genl_info *info)
 		return -EOPNOTSUPP;
 
 	if (!info->attrs[NL80211_ATTR_SSID] &&
-	    dev->ieee80211_ptr->iftype != NL80211_IFTYPE_AP &&
-	    dev->ieee80211_ptr->iftype != NL80211_IFTYPE_P2P_GO)
+	    (dev->ieee80211_ptr->iftype != NL80211_IFTYPE_AP) &&
+	    (dev->ieee80211_ptr->iftype != NL80211_IFTYPE_P2P_GO))
 		return -EINVAL;
 
 	if (!info->attrs[NL80211_ATTR_BSSID])
