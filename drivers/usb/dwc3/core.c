@@ -1401,9 +1401,6 @@ static int dwc3_probe(struct platform_device *pdev)
 err_core_init:
 	dwc3_core_exit_mode(dwc);
 
-err5:
-	dwc3_event_buffers_cleanup(dwc);
-
 err4:
 	dwc3_free_scratch_buffers(dwc);
 
