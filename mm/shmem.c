@@ -2461,6 +2461,7 @@ static void shmem_tag_pins(struct address_space *mapping)
 
 	lru_add_drain();
 	start = 0;
+	rcu_read_lock();
 
 	spin_lock_irq(&mapping->tree_lock);
 	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter, start) {
@@ -2471,8 +2472,10 @@ static void shmem_tag_pins(struct address_space *mapping)
 				continue;
 			}
 		} else if (page_count(page) - page_mapcount(page) > 1) {
+			spin_lock_irq(&mapping->tree_lock);
 			radix_tree_tag_set(&mapping->page_tree, iter.index,
 					   SHMEM_TAG_PINNED);
+			spin_unlock_irq(&mapping->tree_lock);
 		}
 
 		if (++tagged % 1024)
@@ -2483,6 +2486,7 @@ static void shmem_tag_pins(struct address_space *mapping)
 		cond_resched();
 		spin_lock_irq(&mapping->tree_lock);
 	}
+	rcu_read_unlock();
 	spin_unlock_irq(&mapping->tree_lock);
 }
 
