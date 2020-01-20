@@ -2077,8 +2077,8 @@ void hdd_check_for_unsafe_ch(hdd_adapter_t *phostapd_adapter,
 
     for (channelLoop = 0; channelLoop < unsafeChannelCount; channelLoop++)
     {
-        if ((unsafeChannelList[channelLoop] ==
-             phostapd_adapter->sessionCtx.ap.operatingChannel)) {
+        if (unsafeChannelList[channelLoop] ==
+             phostapd_adapter->sessionCtx.ap.operatingChannel) {
             if ((AUTO_CHANNEL_SELECT ==
                 phostapd_adapter->sessionCtx.ap.sapConfig.channel)
                 && (WLAN_HDD_SOFTAP == phostapd_adapter->device_mode)) {
