@@ -7,10 +7,11 @@ properties() { '
 kernel.string=ThdKernel-%KV% by Javinator9889 (for Mi A1/tissot)
 do.devicecheck=1
 do.modules=0
+do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
 device.name1=tissot
-supported.versions=
+supported.versions=10
 supported.patchlevels=
 '; } # end properties
 
@@ -27,9 +28,8 @@ ramdisk_compression=auto;
 
 ## AnyKernel file attributes
 # set permissions/ownership for included ramdisk files
-chmod -R 0750 $ramdisk/*;
-chmod -R 0755 $ramdisk/sbin;
-chown -R root:root $ramdisk;
+set_perm_recursive 0 0 755 644 $ramdisk/*;
+set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 
 
 ## AnyKernel install
@@ -62,14 +62,6 @@ $bin/magiskpolicy --load sepolicy --save sepolicy \
 decompressed_image=/tmp/anykernel/kernel/Image
 compressed_image=$decompressed_image.gz
 if [ -f $compressed_image ]; then
-  # Hexpatch the kernel if Magisk is installed ('skip_initramfs' -> 'want_initramfs')
-  if [ -d $ramdisk/.backup -o -d $ramdisk/.magisk ]; then
-    ui_print " "; ui_print "If you use or want root, flash Magisk after the kernel to avoid issues with previous kernel profiles";
-    $bin/magiskboot --decompress $compressed_image $decompressed_image;
-    $bin/magiskboot --hexpatch $decompressed_image 736B69705F696E697472616D667300 77616E745F696E697472616D667300;
-    $bin/magiskboot --compress=gzip $decompressed_image $compressed_image;
- fi;
-
   ui_print "Checking for Project Treble...";
   if [ "$(file_getprop /system_root/system/build.prop ro.treble.enabled)" = "true" ]; then
     ui_print "Treble Status: Supported";
@@ -81,7 +73,7 @@ if [ -f $compressed_image ]; then
 
   # Concatenate all of the dtbs to the kernel
   cat $compressed_image $dtb/*.dtb > /tmp/anykernel/Image.gz-dtb;
-fi;
+fi
 
 # end ramdisk changes
 
