@@ -37,6 +37,12 @@ file_getprop() {
 }
 ###
 
+# set_progress <progress>
+set_progress() { 
+  echo "set_progress $1" > "$OUTFD"; 
+}
+###
+
 ### file/directory attributes functions:
 # set_perm <owner> <group> <mode> <file> [<file2> ...]
 set_perm() {
@@ -69,6 +75,7 @@ split_boot() {
   if [ ! -e "$(echo $block | cut -d\  -f1)" ]; then
     abort "Invalid partition. Aborting...";
   fi;
+  set_progress 0.2;
   if [ "$(echo $block | grep ' ')" ]; then
     block=$(echo $block | cut -d\  -f1);
     customdd=$(echo $block | cut -d\  -f2-);
@@ -82,6 +89,7 @@ split_boot() {
   fi;
   test $? != 0 && dumpfail=1;
 
+  set_progress 0.25;
   mkdir -p $split_img;
   cd $split_img;
   if [ -f "$bin/unpackelf" ] && $bin/unpackelf -i $bootimg -h -q 2>/dev/null; then
@@ -131,7 +139,7 @@ split_boot() {
       2) touch chromeos;;
     esac;
   fi;
-
+  set_progress 0.3;
   if [ $? != 0 -o "$dumpfail" ]; then
     abort "Dumping/splitting image failed. Aborting...";
   fi;
@@ -150,7 +158,7 @@ unpack_ramdisk() {
     fi;
     mv -f ramdisk.cpio.gz ramdisk.cpio;
   fi;
-
+  set_progress 0.35;
   if [ -f ramdisk.cpio ]; then
     comp=$($bin/magiskboot decompress ramdisk.cpio 2>&1 | grep -v 'raw' | sed -n 's;.*\[\(.*\)\];\1;p');
   else
@@ -165,9 +173,11 @@ unpack_ramdisk() {
     fi;
   fi;
 
+  set_progress 0.4;
   test -d $ramdisk && mv -f $ramdisk $home/rdtmp;
   mkdir -p $ramdisk;
   chmod 755 $ramdisk;
+  set_progress 0.45;
 
   cd $ramdisk;
   EXTRACT_UNSAFE_SYMLINKS=1 cpio -d -F $split_img/ramdisk.cpio -i;
@@ -177,6 +187,7 @@ unpack_ramdisk() {
   if [ -d "$home/rdtmp" ]; then
     cp -af $home/rdtmp/* .;
   fi;
+  set_progress 0.5;
 }
 ### dump_boot (dump and split image, then extract ramdisk)
 dump_boot() {
@@ -208,6 +219,7 @@ repack_ramdisk() {
     find . | cpio -H newc -o > $home/ramdisk-new.cpio;
   fi;
   test $? != 0 && packfail=1;
+  set_progress 0.7;
 
   cd $home;
   $bin/magiskboot cpio ramdisk-new.cpio test;
@@ -222,6 +234,7 @@ repack_ramdisk() {
       rm -f ramdisk-new.cpio;
     fi;
   fi;
+  set_progress 0.73;
   if [ "$packfail" ]; then
     abort "Repacking ramdisk failed. Aborting...";
   fi;
@@ -232,6 +245,7 @@ repack_ramdisk() {
       rootfs|recovery) $bin/mkmtkhdr --$mtktype ramdisk-new.cpio*;;
     esac;
   fi;
+  set_progress 0.75;
 }
 
 # flash_boot (build, sign and write image only)
@@ -250,6 +264,7 @@ flash_boot() {
       eval local $i=\"$(cat boot.img-$i)\";
     fi;
   done;
+  set_progress 0.8;
 
   cd $home;
   for i in zImage zImage-dtb Image Image-dtb Image.gz Image.gz-dtb Image.bz2 Image.bz2-dtb Image.lzo Image.lzo-dtb Image.lzma Image.lzma-dtb Image.xz Image.xz-dtb Image.lz4 Image.lz4-dtb Image.fit; do
@@ -266,6 +281,7 @@ flash_boot() {
   elif [ "$(ls $split_img/kernel* 2>/dev/null)" ]; then
     kernel=$(ls $split_img/kernel* | grep -v 'kernel_dtb' | tail -n1);
   fi;
+  set_progress 0.81;
   if [ "$(ls ramdisk-new.cpio* 2>/dev/null)" ]; then
     ramdisk=$home/$(ls ramdisk-new.cpio* | tail -n1);
   elif [ -f "$bin/mkmtkhdr" -a -f "$split_img/boot.img-base" ]; then
@@ -281,6 +297,7 @@ flash_boot() {
       fi;
     done;
   done;
+  set_progress 0.83;
 
   cd $split_img;
   if [ -f "$bin/mkimage" ]; then
@@ -291,19 +308,24 @@ flash_boot() {
       RAMDisk) part0=$ramdisk;;
     esac;
     $bin/mkimage -A $arch -O $os -T $type -C $comp -a $addr -e $ep -n "$name" -d $part0$part1 $home/boot-new.img;
+    set_progress 0.85;
   elif [ -f "$bin/elftool" ]; then
     test "$dt" && dt="$dt,rpm";
     test -f cmdline.txt && cmdline="cmdline.txt@cmdline";
     $bin/elftool pack -o $home/boot-new.img header=elftool_out/header $kernel $ramdisk,ramdisk $dt $cmdline;
+    set_progress 0.85;
   elif [ -f "$bin/mboot" ]; then
     cp -f $kernel kernel;
     cp -f $ramdisk ramdisk.cpio.gz;
     $bin/mboot -d $split_img -f $home/boot-new.img;
+    set_progress 0.85;
   elif [ -f "$bin/rkcrc" ]; then
     $bin/rkcrc -k $ramdisk $home/boot-new.img;
+    set_progress 0.85;
   elif [ -f "$bin/mkbootimg" -a -f "$bin/unpackelf" -a -f boot.img-base ]; then
     test "$dt" && dt="--dt $dt";
     $bin/mkbootimg --kernel $kernel --ramdisk $ramdisk --cmdline "$cmdline" --base $home --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff --tags_offset "$tagsoff" $dt --output $home/boot-new.img;
+    set_progress 0.85;
   else
     test "$kernel" && cp -f $kernel kernel;
     test "$ramdisk" && cp -f $ramdisk ramdisk.cpio;
@@ -311,14 +333,16 @@ flash_boot() {
     for i in dtb recovery_dtbo; do
       test "$(eval echo \$$i)" -a -f $i && cp -f $(eval echo \$$i) $i;
     done;
+    set_progress 0.85;
     case $kernel in
       *Image*)
         if [ ! "$magisk_patched" ]; then
           $bin/magiskboot cpio ramdisk.cpio test;
           magisk_patched=$?;
+          set_progress 0.87;
         fi;
         if [ $((magisk_patched & 3)) -eq 1 ]; then
-          ui_print " " "Magisk detected! Patching kernel so reflashing Magisk is not necessary...";
+          ui_print " | L Magisk detected! Adding it to the kernel (it is not necessary to flash it again)";
           comp=$($bin/magiskboot decompress kernel 2>&1 | grep -v 'raw' | sed -n 's;.*\[\(.*\)\];\1;p');
           ($bin/magiskboot split $kernel || $bin/magiskboot decompress $kernel kernel) 2>/dev/null;
           if [ $? != 0 -a "$comp" ]; then
@@ -337,16 +361,19 @@ flash_boot() {
             fi;
             mv -f kernel.$comp kernel;
           fi;
+          set_progress 0.87;
           test ! -f .magisk && $bin/magiskboot cpio ramdisk.cpio "extract .backup/.magisk .magisk";
           export $(cat .magisk);
           test $((magisk_patched & 8)) -ne 0 && export TWOSTAGEINIT=true;
           for fdt in dtb extra kernel_dtb recovery_dtbo; do
             test -f $fdt && $bin/magiskboot dtb $fdt patch;
           done;
+          set_progress 0.89;
         else
           case $kernel in
             *-dtb) rm -f kernel_dtb;;
           esac;
+          set_progress 0.89;
         fi;
         unset magisk_patched KEEPFORCEENCRYPT KEEPVERITY SHA1 TWOSTAGEINIT;
       ;;
@@ -355,17 +382,21 @@ flash_boot() {
       none|cpio) nocompflag="-n";;
     esac;
     $bin/magiskboot repack $nocompflag $bootimg $home/boot-new.img;
+    set_progress 0.89;
   fi;
+  set_progress 0.9;
   if [ $? != 0 ]; then
     abort "Repacking image failed. Aborting...";
   fi;
 
+  ui_print " | L Signing kernel...";
   cd $home;
   if [ -f "$bin/futility" -a -d "$bin/chromeos" ]; then
     if [ -f "$split_img/chromeos" ]; then
       echo "Signing with CHROMEOS..." >&2;
       $bin/futility vbutil_kernel --pack boot-new-signed.img --keyblock $bin/chromeos/kernel.keyblock --signprivate $bin/chromeos/kernel_data_key.vbprivk --version 1 --vmlinuz boot-new.img --bootloader $bin/chromeos/empty --config $bin/chromeos/empty --arch arm --flags 0x1;
     fi;
+    set_progress 0.92;
     test $? != 0 && signfail=1;
   fi;
   if [ -f "$bin/BootSignature_Android.jar" -a -d "$bin/avb" ]; then
@@ -380,6 +411,7 @@ flash_boot() {
       /system/bin/dalvikvm -Xnoimage-dex2oat -cp $bin/BootSignature_Android.jar com.android.verity.BootSignature /$avbtype boot-new.img $pk8 $cert boot-new-signed.img;
     fi;
   fi;
+  set_progress 0.95;
   if [ $? != 0 -o "$signfail" ]; then
     abort "Signing image failed. Aborting...";
   fi;
@@ -390,6 +422,7 @@ flash_boot() {
   elif [ "$(wc -c < boot-new.img)" -gt "$(wc -c < boot.img)" ]; then
     abort "New image larger than boot partition. Aborting...";
   fi;
+  ui_print " | L Flashing signed kernel...";
   if [ -f "$bin/flash_erase" -a -f "$bin/nandwrite" ]; then
     $bin/flash_erase $block 0 0;
     $bin/nandwrite -p $block boot-new.img;
@@ -399,6 +432,7 @@ flash_boot() {
   else
     cat boot-new.img /dev/zero > $block 2>/dev/null || true;
   fi;
+  set_progress 0.97;
   if [ $? != 0 ]; then
     abort "Flashing image failed. Aborting...";
   fi;
@@ -416,6 +450,7 @@ flash_dtbo() {
     fi;
   done;
 
+  ui_print " | L Flashing DTBO image...";
   if [ "$dtbo" ]; then
     dtboblock=/dev/block/bootdevice/by-name/dtbo$slot;
     if [ ! -e "$dtboblock" ]; then
@@ -434,6 +469,7 @@ flash_dtbo() {
       abort "Flashing dtbo failed. Aborting...";
     fi;
   fi;
+  set_progress 0.99;
 }
 ### write_boot (repack ramdisk then build, sign and write image and dtbo)
 write_boot() {
