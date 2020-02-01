@@ -331,7 +331,9 @@ static ssize_t gadget_dev_desc_UDC_store(struct config_item *item,
 			gi->composite.gadget_driver.udc_name = NULL;
 			goto err;
 		}
+#ifdef CONFIG_USB_CONFIGFS_UEVENT
 		schedule_work(&gi->work);
+#endif
 	}
 	mutex_unlock(&gi->lock);
 	return len;
@@ -1849,7 +1851,9 @@ static struct config_group *gadgets_make(
 	if (!gi->composite.gadget_driver.function)
 		goto err;
 
+#ifdef CONFIG_USB_CONFIGFS_UEVENT
 	gadget_index++;
+#endif
 	pr_debug("Creating gadget index %d\n", gadget_index);
 	if (android_device_create(gi) < 0)
 		goto err;
@@ -1867,10 +1871,12 @@ static void gadgets_drop(struct config_group *group, struct config_item *item)
 
 	gi = container_of(to_config_group(item), struct gadget_info, group);
 	config_item_put(item);
+#ifdef CONFIG_USB_CONFIGFS_UEVENT
 	if (gi->dev) {
 		android_device_destroy(gi->dev);
 		gi->dev = NULL;
 	}
+#endif
 }
 
 static struct configfs_group_operations gadgets_ops = {
