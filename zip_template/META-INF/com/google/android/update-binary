@@ -345,8 +345,7 @@ do_modules() {
   cd $AKHOME;
 }
 
-# set_progress 0.1;
-show_progress 1.34 46;
+show_progress 1.34 60;
 ui_print " ";
 cleanup;
 mkdir -p $AKHOME/bin;

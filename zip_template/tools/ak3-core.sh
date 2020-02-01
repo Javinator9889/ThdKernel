@@ -316,7 +316,7 @@ flash_boot() {
           magisk_patched=$?;
         fi;
         if [ $((magisk_patched & 3)) -eq 1 ]; then
-          ui_print "      L Magisk detected! Adding it to the kernel (it is not necessary to flash it again)";
+          ui_print "      L Magisk detected! Adding it to the kernel";
           comp=$($bin/magiskboot decompress kernel 2>&1 | grep -v 'raw' | sed -n 's;.*\[\(.*\)\];\1;p');
           ($bin/magiskboot split $kernel || $bin/magiskboot decompress $kernel kernel) 2>/dev/null;
           if [ $? != 0 -a "$comp" ]; then

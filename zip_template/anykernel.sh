@@ -71,7 +71,7 @@ fi
 
 # end ramdisk changes
 
-ui_print "[7/7] Installing ThdKernel-%KV% to the device...";
+ui_print "[7/7] Installing ThdKernel-%KV%...";
 write_boot;
 ## end install
 ui_print "      L ThdKernel-%KV% has been sucessfully installed!";
