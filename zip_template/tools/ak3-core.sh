@@ -1,7 +1,7 @@
 ### AnyKernel methods (DO NOT CHANGE)
 ## osm0sis @ xda-developers
 
-OUTFD=$1;
+# OUTFD=$1;
 
 # set up working directory variables
 test "$home" || home=$PWD;
@@ -38,9 +38,7 @@ file_getprop() {
 ###
 
 # set_progress <progress>
-set_progress() { 
-  echo "set_progress $1" > "$OUTFD"; 
-}
+set_progress() { echo "set_progress $1" > "$OUTFD"; }
 ###
 
 ### file/directory attributes functions:
@@ -342,7 +340,7 @@ flash_boot() {
           set_progress 0.87;
         fi;
         if [ $((magisk_patched & 3)) -eq 1 ]; then
-          ui_print " | L Magisk detected! Adding it to the kernel (it is not necessary to flash it again)";
+          ui_print "     L Magisk detected! Adding it to the kernel (it is not necessary to flash it again)";
           comp=$($bin/magiskboot decompress kernel 2>&1 | grep -v 'raw' | sed -n 's;.*\[\(.*\)\];\1;p');
           ($bin/magiskboot split $kernel || $bin/magiskboot decompress $kernel kernel) 2>/dev/null;
           if [ $? != 0 -a "$comp" ]; then
@@ -389,7 +387,7 @@ flash_boot() {
     abort "Repacking image failed. Aborting...";
   fi;
 
-  ui_print " | L Signing kernel...";
+  ui_print "     L Signing kernel...";
   cd $home;
   if [ -f "$bin/futility" -a -d "$bin/chromeos" ]; then
     if [ -f "$split_img/chromeos" ]; then
@@ -422,7 +420,7 @@ flash_boot() {
   elif [ "$(wc -c < boot-new.img)" -gt "$(wc -c < boot.img)" ]; then
     abort "New image larger than boot partition. Aborting...";
   fi;
-  ui_print " | L Flashing signed kernel...";
+  ui_print "     L Flashing signed kernel...";
   if [ -f "$bin/flash_erase" -a -f "$bin/nandwrite" ]; then
     $bin/flash_erase $block 0 0;
     $bin/nandwrite -p $block boot-new.img;
@@ -450,7 +448,7 @@ flash_dtbo() {
     fi;
   done;
 
-  ui_print " | L Flashing DTBO image...";
+  ui_print "     L Flashing DTBO image...";
   if [ "$dtbo" ]; then
     dtboblock=/dev/block/bootdevice/by-name/dtbo$slot;
     if [ ! -e "$dtboblock" ]; then
