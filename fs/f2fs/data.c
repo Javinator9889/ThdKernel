@@ -200,13 +200,6 @@ static void f2fs_read_end_io(struct bio *bio)
 		return;
 	}
 
-	if (first_page != NULL &&
-		__read_io_type(first_page) == F2FS_RD_DATA) {
-		trace_android_fs_dataread_end(first_page->mapping->host,
-						page_offset(first_page),
-						bio->bi_iter.bi_size);
-	}
-
 	__read_end_io(bio);
 }
 
@@ -759,6 +752,7 @@ int f2fs_merge_page_bio(struct f2fs_io_info *fio)
 	if (bio && !page_is_mergeable(fio->sbi, bio, *fio->last_block,
 						fio->new_blkaddr))
 		f2fs_submit_merged_ipu_write(fio->sbi, &bio, NULL);
+
 alloc_new:
 	if (!bio) {
 		bio = __bio_alloc(fio, BIO_MAX_PAGES);
@@ -767,7 +761,7 @@ alloc_new:
 			fscrypt_set_ice_dun(inode, bio, dun);
 		fscrypt_set_ice_skip(bio, bi_crypt_skip);
 	}
-
+	if (bio_add_page(bio, page, PAGE_SIZE, 0) < PAGE_SIZE) {
 		add_bio_entry(fio->sbi, bio, page, fio->temp);
 	} else {
 		if (add_ipu_page(fio->sbi, &bio, page))

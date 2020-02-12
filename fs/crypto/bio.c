@@ -40,7 +40,8 @@ static void __fscrypt_decrypt_bio(struct bio *bio, bool done)
 			 fscrypt_using_hardware_encryption(page->mapping->host))
 			SetPageUptodate(page);
 		else {
-			int ret = fscrypt_decrypt_page(page->mapping->host,
+			int ret = 
+			fscrypt_decrypt_block_inplace(page->mapping->host,
 				page, PAGE_SIZE, 0, page->index);
 			if (ret) {
 				SetPageError(page);
