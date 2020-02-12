@@ -1,0 +1,102 @@
+#!/bin/bash
+
+echo " _____ _         __   __                     _ ";
+echo "|_   _| |       |  | / /                    | |";
+echo "  | | | |__   __|  |/ /  ___ _ __ _ __   ___| |";
+echo "  | | | '_ \ / _\`     \ / _ | '__| '_ \ / _ | |";
+echo "  | | | | | | (_|  |\  |  __| |  | | | |  __| |";
+echo "  \_/ |_| |_|\__,__| \_/\___|_|  |_| |_|\___|_|";
+echo "                                                ";
+echo "                                                ";
+echo "                                                ";
+
+# read -p "Build the kernel using LTO? [y/n] " LTOS
+
+# if [ "${LTOS}" == "y" ]; then
+#    KERNEL_CONFIG="thdkernel_defconfig"
+# else
+#    KERNEL_CONFIG="thdkernel-nlto_defconfig"
+# fi
+KERNEL_CONFIG="thdkernel_defconfig"
+KV=$(make kernelversion)
+
+echo "Preparing for compiling kernel ThdKernel-${KV}..."
+
+mkdir -p out
+
+make -s clean
+make -s mrproper
+
+make -s O=out clean
+make -s O=out mrproper
+
+rm -rf out/zFile
+
+touch .scmversion
+
+touch out/.scmversion
+
+# Time measurement
+# UNIX timestamp concatenated with nanoseconds
+T="$(date +%s%N)"
+
+# Compilation process
+make -j$(nproc --all) ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-unknown-linux-gnu CFLAGS="-march=native -fPIC" distclean ${KERNEL_CONFIG} deb-pkg
+
+RT=$?
+
+if [ ! "$RT" -eq 0 ]; then
+    echo "There was an error during compilation... exiting"
+    exit $RT
+fi
+
+# Time interval in nanoseconds
+T="$(($(date +%s%N)-T))"
+# Seconds
+S="$((T/1000000000))"
+# Milliseconds
+M="$((T/1000000))"
+
+printf "Compilation process took: "
+
+if [ ! $((S/86400)) -eq 0 ]; then
+    printf "%02dd " "$((S/86400))"
+fi
+
+if [ ! $((S/3600%24)) -eq 0 ]; then
+    printf "%02dh " "$((S/3600%24))"
+fi
+
+if [ ! $((S/60%60)) -eq 0 ]; then
+    printf "%02dm " "$((S/60%60))"
+fi
+
+printf "%02ds\n" "$((S%60))"
+
+# echo "Creating flashable ZIP..."
+# echo ""
+
+# cp -r zip_template/ out/zFile
+# cp out/arch/arm64/boot/Image.gz out/zFile/kernel/Image.gz
+# cp out/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-tissot-nontreble.dtb out/zFile/dtb-nontreble/
+# cp out/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-tissot-treble.dtb out/zFile/dtb-treble/
+
+# sed -i -e "s/%KV%/${KV}/g" out/zFile/anykernel.sh
+
+# cd out/zFile
+# zip -rq9 "ThdKernel-${KV}.zip" * -x "ThdKernel-${KV}.zip"
+
+# printf "Created ZIP file - available at: out/zFile/ThdKernel-%s.zip\n" "${KV}"
+
+
+
+echo " _____ _         __   __                     _ ";
+echo "|_   _| |       |  | / /                    | |";
+echo "  | | | |__   __|  |/ /  ___ _ __ _ __   ___| |";
+echo "  | | | '_ \ / _\`     \ / _ | '__| '_ \ / _ | |";
+echo "  | | | | | | (_|  |\  |  __| |  | | | |  __| |";
+echo "  \_/ |_| |_|\__,__| \_/\___|_|  |_| |_|\___|_|";
+echo "                                                ";
+echo "                                                ";
+echo "                                                ";
+
