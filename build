@@ -17,7 +17,7 @@ echo "                                                ";
 # else
 #    KERNEL_CONFIG="thdkernel-nlto_defconfig"
 # fi
-KERNEL_CONFIG="thdkernel_defconfig"
+KERNEL_CONFIG="thdkernel-new_defconfig"
 KV=$(make kernelversion)
 
 echo "Preparing for compiling kernel ThdKernel-${KV}..."
@@ -41,7 +41,9 @@ touch out/.scmversion
 T="$(date +%s%N)"
 
 # Compilation process
-make -j$(nproc --all) ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-unknown-linux-gnu CFLAGS="-march=native -fPIC" distclean ${KERNEL_CONFIG} deb-pkg
+make O=out CC=clang HOSTCC=clang distclean ${KERNEL_CONFIG}
+make -j$(nproc --all) O=out ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu CFLAGS="-march=native -fPIC"
+make -j$(nproc --all) O=out ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu bindeb-pkg
 
 RT=$?
 

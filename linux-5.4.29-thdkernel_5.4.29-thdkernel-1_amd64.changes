@@ -1,0 +1,34 @@
+Format: 1.8
+Date: Thu, 02 Apr 2020 11:08:42 +0200
+Source: linux-5.4.29-thdkernel
+Binary: linux-image-5.4.29-thdkernel linux-headers-5.4.29-thdkernel linux-libc-dev linux-image-5.4.29-thdkernel-dbg
+Architecture: amd64
+Version: 5.4.29-thdkernel-1
+Distribution: bionic
+Urgency: low
+Maintainer: javinator9889 <javinator9889@zorin-X580GD>
+Changed-By: javinator9889 <javinator9889@zorin-X580GD>
+Description:
+ linux-headers-5.4.29-thdkernel - Linux kernel headers for 5.4.29-thdkernel on amd64
+ linux-image-5.4.29-thdkernel - Linux kernel, version 5.4.29-thdkernel
+ linux-image-5.4.29-thdkernel-dbg - Linux kernel debugging symbols for 5.4.29-thdkernel
+ linux-libc-dev - Linux support headers for userspace development
+Changes:
+ linux-5.4.29-thdkernel (5.4.29-thdkernel-1) bionic; urgency=low
+ .
+   * Custom built Linux kernel.
+Checksums-Sha1:
+ a28f1b1a73fcf8a22da8f1ca702f39d3f2459c26 6059 linux-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.buildinfo
+ 302ed08e3f290dae73449a9e5f18bd2534e8bc95 11037496 linux-headers-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.deb
+ 888ab90f47abff44b8ce069c044ea4772e51933a 13257368 linux-image-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.deb
+ 95ef3b05b0c210e73d455df6851a92473659e493 1066680 linux-libc-dev_5.4.29-thdkernel-1_amd64.deb
+Checksums-Sha256:
+ 46b32a7c7ec91c40aed7c5f5acd5847ca912009cb45380f0fde2f8f1f3c73a56 6059 linux-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.buildinfo
+ f78a621d6f086f208ce2b7064ae82d3e16284b329000b4b9f0c1ce0a6399bd42 11037496 linux-headers-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.deb
+ aeaa279c4f73e4311b9d9af295310542fdc8b5764d1fa3808d72239e90645cb1 13257368 linux-image-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.deb
+ 5eb4ac12b6e45a2617c1e12ac64aabea45869148682ceaa82a77f754480bdf42 1066680 linux-libc-dev_5.4.29-thdkernel-1_amd64.deb
+Files:
+ 0e58ce0fdb8b33b53c2ee3d0e5570509 6059 kernel optional linux-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.buildinfo
+ f6bbf04dea946f1e8d9a11e4855e3350 11037496 kernel optional linux-headers-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.deb
+ cb6b7cd0df0bb809a8e4ba1f26ec2749 13257368 kernel optional linux-image-5.4.29-thdkernel_5.4.29-thdkernel-1_amd64.deb
+ b6f559cec3ee95986ee9d5c0a2ce735d 1066680 devel optional linux-libc-dev_5.4.29-thdkernel-1_amd64.deb
