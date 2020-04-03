@@ -10,40 +10,38 @@ echo "                                                ";
 echo "                                                ";
 echo "                                                ";
 
-# read -p "Build the kernel using LTO? [y/n] " LTOS
+read -p "Build the kernel using clang?(GCC will be used if not) [y/n] " ENABLE_CLANG
 
-# if [ "${LTOS}" == "y" ]; then
-#    KERNEL_CONFIG="thdkernel_defconfig"
-# else
-#    KERNEL_CONFIG="thdkernel-nlto_defconfig"
-# fi
-KERNEL_CONFIG="thdkernel-new_defconfig"
+if [ "${ENABLE_CLANG}" == "y" ]; then
+   KERNEL_CONFIG="thdkernel-latest-clang_defconfig"
+   CC=clang
+   HOSTCC=clang
+else
+   KERNEL_CONFIG="thdkernel-latest_defconfig"
+   CC=gcc
+   HOSTCC=gcc
+fi
 KV=$(make kernelversion)
 
 echo "Preparing for compiling kernel ThdKernel-${KV}..."
 
-mkdir -p out
+rm -rf ../linux*.gz
 
 make -s clean
 make -s mrproper
 
-make -s O=out clean
-make -s O=out mrproper
-
-rm -rf out/zFile
-
 touch .scmversion
-
-touch out/.scmversion
 
 # Time measurement
 # UNIX timestamp concatenated with nanoseconds
 T="$(date +%s%N)"
 
 # Compilation process
-make O=out CC=clang HOSTCC=clang distclean ${KERNEL_CONFIG}
-make -j$(nproc --all) O=out ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu CFLAGS="-march=native -fPIC"
-make -j$(nproc --all) O=out ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu bindeb-pkg
+# make O=out CC=clang HOSTCC=clang distclean ${KERNEL_CONFIG}
+make CC=${CC} HOSTCC=${HOSTCC} distclean ${KERNEL_CONFIG}
+MAKEFLAGS="CC=${CC} HOSTCC=${HOSTCC} CFLAGS=-march=native" fakeroot make-kpkg -j $(nproc --all) --initrd kernel_image kernel_headers modules_image
+# make -j$(nproc --all) ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu CFLAGS="-march=native -fPIC" distclean ${KERNEL_CONFIG} deb-pkg
+# make -j$(nproc --all) O=out ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu bindeb-pkg
 
 RT=$?
 
