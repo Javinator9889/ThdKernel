@@ -1,0 +1,105 @@
+#!/bin/bash
+
+echo " _____ _         __   __                     _ ";
+echo "|_   _| |       |  | / /                    | |";
+echo "  | | | |__   __|  |/ /  ___ _ __ _ __   ___| |";
+echo "  | | | '_ \ / _\`     \ / _ | '__| '_ \ / _ | |";
+echo "  | | | | | | (_|  |\  |  __| |  | | | |  __| |";
+echo "  \_/ |_| |_|\__,__| \_/\___|_|  |_| |_|\___|_|";
+echo "                                                ";
+echo "                                                ";
+echo "                                                ";
+
+KERNEL_CONFIG="thdkernel-latest_defconfig"
+KV=$(make kernelversion)
+MAKE_OPTS="-j$(nproc --all)"
+CCFLAGS="-march=skylake -mtune=skylake -O2 -pipe -msse -msse2 -msse3 -mmmx -m3dnow"
+CCXXFLAGS="$CFLAGS"
+CC="/usr/bin/gcc $CCFLAGS"
+CXX="/usr/bin/g++ $CCFLAGS"
+HOSTCC=$CC
+# pyenv specific data
+export PYTHON_CFLAGS="$CFLAGS"
+# end of compilation options
+
+# make with options defined above
+alias make="/usr/bin/make $MAKE_OPTS CC='$CC' CXX='$CXX'"
+
+echo "Preparing for compiling kernel ThdKernel-${KV}..."
+
+rm -rf ../linux*.gz
+
+make -s clean
+make -s mrproper
+
+touch .scmversion
+
+# Time measurement
+# UNIX timestamp concatenated with nanoseconds
+T="$(date +%s%N)"
+
+# Compilation process
+make O=out ${MAKE_OPTS} CFLAGS="${CCFLAGS}" CXXFLAGS="${CCXXFLAGS}" distclean ${KERNEL_CONFIG} all bindeb-pkg
+# make O=out CC=clang HOSTCC=clang distclean ${KERNEL_CONFIG}
+# make CC=${CC} HOSTCC=${HOSTCC} distclean ${KERNEL_CONFIG}
+# MAKEFLAGS="CC=${CC} HOSTCC=${HOSTCC} CFLAGS=-march=native" fakeroot make-kpkg -j $(nproc --all) --initrd kernel_image kernel_headers modules_image
+# make -j$(nproc --all) ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu CFLAGS="-march=native -fPIC" distclean ${KERNEL_CONFIG} deb-pkg
+# make -j$(nproc --all) O=out ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu bindeb-pkg
+
+RT=$?
+
+if [ ! "$RT" -eq 0 ]; then
+    echo "There was an error during compilation... exiting"
+    exit $RT
+fi
+
+# Time interval in nanoseconds
+T="$(($(date +%s%N)-T))"
+# Seconds
+S="$((T/1000000000))"
+# Milliseconds
+M="$((T/1000000))"
+
+printf "Compilation process took: "
+
+if [ ! $((S/86400)) -eq 0 ]; then
+    printf "%02dd " "$((S/86400))"
+fi
+
+if [ ! $((S/3600%24)) -eq 0 ]; then
+    printf "%02dh " "$((S/3600%24))"
+fi
+
+if [ ! $((S/60%60)) -eq 0 ]; then
+    printf "%02dm " "$((S/60%60))"
+fi
+
+printf "%02ds\n" "$((S%60))"
+
+# echo "Creating flashable ZIP..."
+# echo ""
+
+# cp -r zip_template/ out/zFile
+# cp out/arch/arm64/boot/Image.gz out/zFile/kernel/Image.gz
+# cp out/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-tissot-nontreble.dtb out/zFile/dtb-nontreble/
+# cp out/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-tissot-treble.dtb out/zFile/dtb-treble/
+
+# sed -i -e "s/%KV%/${KV}/g" out/zFile/anykernel.sh
+
+# cd out/zFile
+# zip -rq9 "ThdKernel-${KV}.zip" * -x "ThdKernel-${KV}.zip"
+
+# printf "Created ZIP file - available at: out/zFile/ThdKernel-%s.zip\n" "${KV}"
+
+
+
+echo " _____ _         __   __                     _ ";
+echo "|_   _| |       |  | / /                    | |";
+echo "  | | | |__   __|  |/ /  ___ _ __ _ __   ___| |";
+echo "  | | | '_ \ / _\`     \ / _ | '__| '_ \ / _ | |";
+echo "  | | | | | | (_|  |\  |  __| |  | | | |  __| |";
+echo "  \_/ |_| |_|\__,__| \_/\___|_|  |_| |_|\___|_|";
+echo "                                                ";
+echo "                                                ";
+echo "                                                ";
+

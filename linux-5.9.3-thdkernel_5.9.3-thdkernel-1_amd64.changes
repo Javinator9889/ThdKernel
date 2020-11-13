@@ -1,0 +1,33 @@
+Format: 1.8
+Date: Tue, 03 Nov 2020 17:28:16 +0100
+Source: linux-5.9.3-thdkernel
+Binary: linux-headers-5.9.3-thdkernel linux-image-5.9.3-thdkernel linux-libc-dev
+Architecture: amd64
+Version: 5.9.3-thdkernel-1
+Distribution: focal
+Urgency: low
+Maintainer: javinator9889 <javinator9889@Tony-MkIII>
+Changed-By: javinator9889 <javinator9889@Tony-MkIII>
+Description:
+ linux-headers-5.9.3-thdkernel - Linux kernel headers for 5.9.3-thdkernel on amd64
+ linux-image-5.9.3-thdkernel - Linux kernel, version 5.9.3-thdkernel
+ linux-libc-dev - Linux support headers for userspace development
+Changes:
+ linux-5.9.3-thdkernel (5.9.3-thdkernel-1) focal; urgency=low
+ .
+   * Custom built Linux kernel.
+Checksums-Sha1:
+ e68502ea39e749bd24a2f192883556a7d197282f 5802 linux-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.buildinfo
+ 69b96906979937d469161c46c8bad5aef07f1e97 7667348 linux-headers-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.deb
+ 33b918999ded2978a857b8f2123ef8fc6974a9ea 33160304 linux-image-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.deb
+ a85bc05829e63fedc0af0e4ca2aaa0c6f42b755b 1119228 linux-libc-dev_5.9.3-thdkernel-1_amd64.deb
+Checksums-Sha256:
+ b35e20c69cad2a8644965f8d533886908c76d12286ae36d2e65a4615d0f102ee 5802 linux-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.buildinfo
+ 11d498b7ec2e7da580fc67059c3522e82d8876fc374d94a1429bcf8773373268 7667348 linux-headers-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.deb
+ f682b4cbde1050ed7c49f759db2b936a16703d1f808a2eee0eae2138b6d18dae 33160304 linux-image-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.deb
+ 36d07bca1c3ad5f8849d4fd66acd50c1bf882eed4120f246e66574c6642d08e5 1119228 linux-libc-dev_5.9.3-thdkernel-1_amd64.deb
+Files:
+ 60383e3d6c698d95d387d4b242264ec1 5802 kernel optional linux-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.buildinfo
+ 6ea9f7918205172db3791bcf551fab22 7667348 kernel optional linux-headers-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.deb
+ 17cb9f7ab3beb14f945d36f0fd0f92dc 33160304 kernel optional linux-image-5.9.3-thdkernel_5.9.3-thdkernel-1_amd64.deb
+ 28544bd22478403bfd4d05d544565e02 1119228 devel optional linux-libc-dev_5.9.3-thdkernel-1_amd64.deb
