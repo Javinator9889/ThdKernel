@@ -40,8 +40,7 @@
 #include <linux/memblock.h>
 #include <linux/fault-inject.h>
 #include <linux/time_namespace.h>
-
-#include <asm/futex.h>
+#include <linux/futex.h>
 
 #include "locking/rtmutex_common.h"
 
@@ -166,10 +165,8 @@ static int  __read_mostly futex_cmpxchg_enabled;
 #endif
 #define FLAGS_CLOCKRT		0x02
 #define FLAGS_HAS_TIMEOUT	0x04
-<<<<<<< HEAD
 #define FLAGS_WAKE_MULTIPLE	0x08
-=======
- */
+
 struct futex_pi_state {
 	/*
 	 * list of 'owned' pi_state instances - these have to be
