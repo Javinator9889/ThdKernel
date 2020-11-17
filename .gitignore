@@ -152,3 +152,7 @@ x509.genkey
 
 # Clang's compilation database file
 /compile_commands.json
+
+*.deb
+*.buildinfo
+*.changes
