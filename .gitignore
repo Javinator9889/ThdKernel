@@ -156,3 +156,7 @@ x509.genkey
 *.deb
 *.buildinfo
 *.changes
+
+# Signing keys
+MOK.priv
+MOK.pem
