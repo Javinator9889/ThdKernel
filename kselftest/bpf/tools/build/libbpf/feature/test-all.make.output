@@ -1,0 +1,5 @@
+En el fichero incluido desde test-all.c:14:
+test-libpython.c:2:10: error fatal: Python.h: No existe el archivo o el directorio
+    2 | #include <Python.h>
+      |          ^~~~~~~~~~
+compilación terminada.

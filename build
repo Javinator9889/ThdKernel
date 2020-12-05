@@ -39,7 +39,11 @@ touch .scmversion
 T="$(date +%s%N)"
 
 # Compilation process
-make O=out ${MAKE_OPTS} CFLAGS="${CCFLAGS}" CXXFLAGS="${CCXXFLAGS}" distclean ${KERNEL_CONFIG} prepare all bindeb-pkg
+make O=out ${MAKE_OPTS} CFLAGS="${CCFLAGS}" CXXFLAGS="${CCXXFLAGS}" distclean ${KERNEL_CONFIG} prepare all
+cd tools/
+make O=../out acpi cgroup cpupower firmware intel-speed-select kvm_stat leds objtool pci perf bootconfig tmon turbostat usb virtio x86_energy_perf_policy
+cd ..
+make O=out bindeb-pkg
 # make O=out CC=clang HOSTCC=clang distclean ${KERNEL_CONFIG}
 # make CC=${CC} HOSTCC=${HOSTCC} distclean ${KERNEL_CONFIG}
 # MAKEFLAGS="CC=${CC} HOSTCC=${HOSTCC} CFLAGS=-march=native" fakeroot make-kpkg -j $(nproc --all) --initrd kernel_image kernel_headers modules_image
