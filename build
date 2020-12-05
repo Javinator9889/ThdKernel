@@ -39,11 +39,18 @@ touch .scmversion
 T="$(date +%s%N)"
 
 # Compilation process
-make O=out ${MAKE_OPTS} CFLAGS="${CCFLAGS}" CXXFLAGS="${CCXXFLAGS}" distclean ${KERNEL_CONFIG} prepare all
+make O=out ${MAKE_OPTS} CFLAGS="${CCFLAGS}" CXXFLAGS="${CCXXFLAGS}" distclean ${KERNEL_CONFIG} prepare all bindeb-pkg
+
+echo "Creating tools package..."
 cd tools/
-make O=../out cgroup cpupower firmware intel-speed-select leds objtool pci perf bootconfig tmon usb x86_energy_perf_policy
+make cpupower intel-speed-select pci perf bootconfig tmon usb x86_energy_perf_policy
+sudo checkinstall -D --pkgname "linux-tools-thdkernel-${KV}" --pkgversion "${KV}" --pakdir .. --gzman -y --install=no --maintainer dev@javinator9889.com --exclude /root /media make cpupower_install intel-speed-select_install pci_install perf_install bootconfig_install tmon_install usb_install x86_energy_perf_policy_install
 cd ..
-make O=out bindeb-pkg
+sudo chown $USER:$USER *.deb
+# cd tools/
+# make O=../out cgroup cpupower firmware intel-speed-select leds objtool pci perf bootconfig tmon usb x86_energy_perf_policy
+# cd ..
+# make O=out bindeb-pkg
 # make O=out CC=clang HOSTCC=clang distclean ${KERNEL_CONFIG}
 # make CC=${CC} HOSTCC=${HOSTCC} distclean ${KERNEL_CONFIG}
 # MAKEFLAGS="CC=${CC} HOSTCC=${HOSTCC} CFLAGS=-march=native" fakeroot make-kpkg -j $(nproc --all) --initrd kernel_image kernel_headers modules_image
