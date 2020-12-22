@@ -116,13 +116,6 @@ nfsd_proc_root(struct svc_rqst *rqstp)
 	return rpc_success;
 }
 
-/* Obsolete, replaced by MNTPROC_MNT. */
-static __be32
-nfsd_proc_root(struct svc_rqst *rqstp)
-{
-	return nfs_ok;
-}
-
 /*
  * Look up a path name component
  * Note: the dentry in the resp->fh may be negative if the file
@@ -216,13 +209,6 @@ static __be32
 nfsd_proc_writecache(struct svc_rqst *rqstp)
 {
 	return rpc_success;
-}
-
-/* Reserved */
-static __be32
-nfsd_proc_writecache(struct svc_rqst *rqstp)
-{
-	return nfs_ok;
 }
 
 /*
