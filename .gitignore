@@ -163,3 +163,7 @@ sphinx_*/
 # Signing keys
 MOK.priv
 MOK.pem
+
+# Backup files
+tools/*.tgz
+tools/*-pak
