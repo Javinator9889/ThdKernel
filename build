@@ -40,7 +40,12 @@ T="$(date +%s%N)"
 
 # Compilation process
 make O=out ${MAKE_OPTS} CFLAGS="${CCFLAGS}" CXXFLAGS="${CCXXFLAGS}" distclean ${KERNEL_CONFIG} prepare all bindeb-pkg
+RT=$?
 
+if [ ! "$RT" -eq 0 ]; then
+    echo "There was an error during compilation... aborting"
+    exit $RT
+fi
 echo "Creating tools package..."
 cd tools/
 make cpupower intel-speed-select pci perf bootconfig tmon usb x86_energy_perf_policy
