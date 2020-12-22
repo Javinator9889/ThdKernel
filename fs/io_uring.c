@@ -6497,8 +6497,6 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
 	/* one is dropped after submission, the other at completion */
 	refcount_set(&req->refs, 2);
 	req->task = current;
-	get_task_struct(req->task);
-	atomic_long_inc(&req->task->io_uring->req_issue);
 	req->result = 0;
 
 	if (unlikely(req->opcode >= IORING_OP_LAST))

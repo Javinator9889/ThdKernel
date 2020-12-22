@@ -251,15 +251,6 @@ static void gfs2_rgrp_go_dump(struct seq_file *seq, struct gfs2_glock *gl,
 		gfs2_rgrp_dump(seq, rgd, fs_id_buf);
 }
 
-static void gfs2_rgrp_go_dump(struct seq_file *seq, struct gfs2_glock *gl,
-			      const char *fs_id_buf)
-{
-	struct gfs2_rgrpd *rgd = gl->gl_object;
-
-	if (rgd)
-		gfs2_rgrp_dump(seq, rgd, fs_id_buf);
-}
-
 static struct gfs2_inode *gfs2_glock2inode(struct gfs2_glock *gl)
 {
 	struct gfs2_inode *ip;
