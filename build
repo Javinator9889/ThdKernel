@@ -52,15 +52,6 @@ make cpupower intel-speed-select pci perf bootconfig tmon usb x86_energy_perf_po
 sudo checkinstall -D --pkgname "linux-tools-thdkernel-${KV}" --pkgversion "${KV}" --pakdir .. --gzman -y --install=no --maintainer dev@javinator9889.com --exclude /root --exclude /media make cpupower_install intel-speed-select_install pci_install perf_install bootconfig_install tmon_install usb_install x86_energy_perf_policy_install
 cd ..
 sudo chown $USER:$USER *.deb
-# cd tools/
-# make O=../out cgroup cpupower firmware intel-speed-select leds objtool pci perf bootconfig tmon usb x86_energy_perf_policy
-# cd ..
-# make O=out bindeb-pkg
-# make O=out CC=clang HOSTCC=clang distclean ${KERNEL_CONFIG}
-# make CC=${CC} HOSTCC=${HOSTCC} distclean ${KERNEL_CONFIG}
-# MAKEFLAGS="CC=${CC} HOSTCC=${HOSTCC} CFLAGS=-march=native" fakeroot make-kpkg -j $(nproc --all) --initrd kernel_image kernel_headers modules_image
-# make -j$(nproc --all) ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu CFLAGS="-march=native -fPIC" distclean ${KERNEL_CONFIG} deb-pkg
-# make -j$(nproc --all) O=out ARCH=x86 CC=clang HOSTCC=clang CLANG_TRIPLE=x86_64-linux-gnu bindeb-pkg
 
 RT=$?
 
@@ -91,23 +82,6 @@ if [ ! $((S/60%60)) -eq 0 ]; then
 fi
 
 printf "%02ds\n" "$((S%60))"
-
-# echo "Creating flashable ZIP..."
-# echo ""
-
-# cp -r zip_template/ out/zFile
-# cp out/arch/arm64/boot/Image.gz out/zFile/kernel/Image.gz
-# cp out/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-tissot-nontreble.dtb out/zFile/dtb-nontreble/
-# cp out/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-tissot-treble.dtb out/zFile/dtb-treble/
-
-# sed -i -e "s/%KV%/${KV}/g" out/zFile/anykernel.sh
-
-# cd out/zFile
-# zip -rq9 "ThdKernel-${KV}.zip" * -x "ThdKernel-${KV}.zip"
-
-# printf "Created ZIP file - available at: out/zFile/ThdKernel-%s.zip\n" "${KV}"
-
-
 
 echo " _____ _         __   __                     _ ";
 echo "|_   _| |       |  | / /                    | |";
