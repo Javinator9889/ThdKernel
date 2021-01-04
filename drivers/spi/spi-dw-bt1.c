@@ -280,10 +280,8 @@ static int dw_spi_bt1_probe(struct platform_device *pdev)
 	dws->bus_num = pdev->id;
 	dws->reg_io_width = 4;
 	dws->max_freq = clk_get_rate(dwsbt1->clk);
-	if (!dws->max_freq) {
-		ret = -EINVAL;
+	if (!dws->max_freq)
 		goto err_disable_clk;
-	}
 
 	init_func = device_get_match_data(&pdev->dev);
 	ret = init_func(pdev, dwsbt1);

@@ -146,7 +146,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&rgmii_pins>;
 	phy-mode = "rgmii-id";
-	phy-handle = <&phy1>;
+	phy = <&phy1>;
 	status = "okay";
 };
 

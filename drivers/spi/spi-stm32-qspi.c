@@ -434,10 +434,8 @@ static int stm32_qspi_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 	int ret;
 
 	ret = pm_runtime_get_sync(qspi->dev);
-	if (ret < 0) {
-		pm_runtime_put_noidle(qspi->dev);
+	if (ret < 0)
 		return ret;
-	}
 
 	mutex_lock(&qspi->lock);
 	ret = stm32_qspi_send(mem, op);
@@ -464,10 +462,8 @@ static int stm32_qspi_setup(struct spi_device *spi)
 		return -EINVAL;
 
 	ret = pm_runtime_get_sync(qspi->dev);
-	if (ret < 0) {
-		pm_runtime_put_noidle(qspi->dev);
+	if (ret < 0)
 		return ret;
-	}
 
 	presc = DIV_ROUND_UP(qspi->clk_rate, spi->max_speed_hz) - 1;
 

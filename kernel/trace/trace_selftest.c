@@ -787,7 +787,7 @@ trace_selftest_startup_function_graph(struct tracer *trace,
 
 	/* Have we just recovered from a hang? */
 	if (graph_hang_thresh > GRAPH_MAX_FUNC_TEST) {
-		disable_tracing_selftest("recovering from a hang");
+		tracing_selftest_disabled = true;
 		ret = -1;
 		goto out;
 	}

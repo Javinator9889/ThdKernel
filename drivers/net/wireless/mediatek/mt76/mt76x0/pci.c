@@ -194,8 +194,7 @@ mt76x0e_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	return 0;
 
 error:
-	mt76_free_device(&dev->mt76);
-
+	ieee80211_free_hw(mt76_hw(dev));
 	return ret;
 }
 

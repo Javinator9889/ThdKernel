@@ -84,6 +84,7 @@ int ath11k_dp_tx(struct ath11k *ar, struct ath11k_vif *arvif,
 	struct ath11k_dp *dp = &ab->dp;
 	struct hal_tx_info ti = {0};
 	struct ieee80211_tx_info *info = IEEE80211_SKB_CB(skb);
+	struct ieee80211_key_conf *key = info->control.hw_key;
 	struct ath11k_skb_cb *skb_cb = ATH11K_SKB_CB(skb);
 	struct hal_srng *tcl_ring;
 	struct ieee80211_hdr *hdr = (void *)skb->data;
@@ -148,9 +149,9 @@ tcl_ring_sel:
 	ti.meta_data_flags = arvif->tcl_metadata;
 
 	if (ti.encap_type == HAL_TCL_ENCAP_TYPE_RAW) {
-		if (skb_cb->flags & ATH11K_SKB_CIPHER_SET) {
+		if (key) {
 			ti.encrypt_type =
-				ath11k_dp_tx_get_encrypt_type(skb_cb->cipher);
+				ath11k_dp_tx_get_encrypt_type(key->cipher);
 
 			if (ieee80211_has_protected(hdr->frame_control))
 				skb_put(skb, IEEE80211_CCMP_MIC_LEN);

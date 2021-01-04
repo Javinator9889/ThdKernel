@@ -286,7 +286,7 @@ static int alloc_qpc(struct hns_roce_dev *hr_dev, struct hns_roce_qp *hr_qp)
 		}
 	}
 
-	if (hr_dev->caps.flags & HNS_ROCE_CAP_FLAG_QP_FLOW_CTRL) {
+	if (hr_dev->caps.sccc_sz) {
 		/* Alloc memory for SCC CTX */
 		ret = hns_roce_table_get(hr_dev, &qp_table->sccc_table,
 					 hr_qp->qpn);
@@ -432,12 +432,7 @@ static int set_extend_sge_param(struct hns_roce_dev *hr_dev, u32 sq_wqe_cnt,
 	}
 
 	hr_qp->sge.sge_shift = HNS_ROCE_SGE_SHIFT;
-
-	/* If the number of extended sge is not zero, they MUST use the
-	 * space of HNS_HW_PAGE_SIZE at least.
-	 */
-	hr_qp->sge.sge_cnt = cnt ?
-			max(cnt, (u32)HNS_HW_PAGE_SIZE / HNS_ROCE_SGE_SIZE) : 0;
+	hr_qp->sge.sge_cnt = cnt;
 
 	return 0;
 }
@@ -865,12 +860,9 @@ static int set_qp_param(struct hns_roce_dev *hr_dev, struct hns_roce_qp *hr_qp,
 	}
 
 	if (udata) {
-		ret = ib_copy_from_udata(ucmd, udata,
-					 min(udata->inlen, sizeof(*ucmd)));
-		if (ret) {
-			ibdev_err(ibdev,
-				  "failed to copy QP ucmd, ret = %d\n", ret);
-			return ret;
+		if (ib_copy_from_udata(ucmd, udata, sizeof(*ucmd))) {
+			ibdev_err(ibdev, "Failed to copy QP ucmd\n");
+			return -EFAULT;
 		}
 
 		ret = set_user_sq_size(hr_dev, &init_attr->cap, hr_qp, ucmd);

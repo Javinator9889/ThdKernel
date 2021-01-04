@@ -2313,9 +2313,7 @@ iscsi_create_conn(struct iscsi_cls_session *session, int dd_size, uint32_t cid)
 	return conn;
 
 release_conn_ref:
-	device_unregister(&conn->dev);
-	put_device(&session->dev);
-	return NULL;
+	put_device(&conn->dev);
 release_parent_ref:
 	put_device(&session->dev);
 free_conn:

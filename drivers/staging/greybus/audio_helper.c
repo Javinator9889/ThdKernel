@@ -135,8 +135,7 @@ int gbaudio_dapm_free_controls(struct snd_soc_dapm_context *dapm,
 		if (!w) {
 			dev_err(dapm->dev, "%s: widget not found\n",
 				widget->name);
-			widget++;
-			continue;
+			return -EINVAL;
 		}
 		widget++;
 #ifdef CONFIG_DEBUG_FS

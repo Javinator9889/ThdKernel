@@ -240,8 +240,7 @@ int mt7615_mmio_probe(struct device *pdev, void __iomem *mem_base,
 
 	return 0;
 error:
-	mt76_free_device(&dev->mt76);
-
+	ieee80211_free_hw(mt76_hw(dev));
 	return ret;
 }
 

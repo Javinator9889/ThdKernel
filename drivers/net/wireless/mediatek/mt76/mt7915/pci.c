@@ -140,7 +140,7 @@ static int mt7915_pci_probe(struct pci_dev *pdev,
 	dev = container_of(mdev, struct mt7915_dev, mt76);
 	ret = mt7915_alloc_device(pdev, dev);
 	if (ret)
-		goto error;
+		return ret;
 
 	mt76_mmio_init(&dev->mt76, pcim_iomap_table(pdev)[0]);
 	mdev->rev = (mt7915_l1_rr(dev, MT_HW_CHIPID) << 16) |
@@ -163,8 +163,7 @@ static int mt7915_pci_probe(struct pci_dev *pdev,
 
 	return 0;
 error:
-	mt76_free_device(&dev->mt76);
-
+	ieee80211_free_hw(mt76_hw(dev));
 	return ret;
 }
 

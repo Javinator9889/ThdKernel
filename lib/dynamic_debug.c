@@ -561,14 +561,9 @@ static int ddebug_exec_queries(char *query, const char *modname)
 int dynamic_debug_exec_queries(const char *query, const char *modname)
 {
 	int rc;
-	char *qry; /* writable copy of query */
+	char *qry = kstrndup(query, PAGE_SIZE, GFP_KERNEL);
 
-	if (!query) {
-		pr_err("non-null query/command string expected\n");
-		return -EINVAL;
-	}
-	qry = kstrndup(query, PAGE_SIZE, GFP_KERNEL);
-	if (!qry)
+	if (!query)
 		return -ENOMEM;
 
 	rc = ddebug_exec_queries(qry, modname);

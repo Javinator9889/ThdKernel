@@ -446,11 +446,8 @@ bool ice_alloc_rx_bufs_zc(struct ice_ring *rx_ring, u16 count)
 		}
 	} while (--count);
 
-	if (rx_ring->next_to_use != ntu) {
-		/* clear the status bits for the next_to_use descriptor */
-		rx_desc->wb.status_error0 = 0;
+	if (rx_ring->next_to_use != ntu)
 		ice_release_rx_desc(rx_ring, ntu);
-	}
 
 	return ret;
 }

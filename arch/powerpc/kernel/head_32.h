@@ -131,28 +131,18 @@
 #ifdef CONFIG_VMAP_STACK
 	mfspr	r11, SPRN_SRR0
 	mtctr	r11
-	andi.	r11, r9, MSR_PR
-	mr	r11, r1
-	lwz	r1,TASK_STACK-THREAD(r12)
-	beq-	99f
-	addi	r1, r1, THREAD_SIZE - INT_FRAME_SIZE
-	li	r10, MSR_KERNEL & ~(MSR_IR | MSR_RI) /* can take DTLB miss */
-	mtmsr	r10
-	isync
-	tovirt(r12, r12)
-	stw	r11,GPR1(r1)
-	stw	r11,0(r1)
-	mr	r11, r1
-#else
+#endif
 	andi.	r11, r9, MSR_PR
 	lwz	r11,TASK_STACK-THREAD(r12)
 	beq-	99f
 	addi	r11, r11, THREAD_SIZE - INT_FRAME_SIZE
-	tophys(r11, r11)
-	stw	r1,GPR1(r11)
-	stw	r1,0(r11)
-	tovirt(r1, r11)		/* set new kernel sp */
+#ifdef CONFIG_VMAP_STACK
+	li	r10, MSR_KERNEL & ~(MSR_IR | MSR_RI) /* can take DTLB miss */
+	mtmsr	r10
+	isync
 #endif
+	tovirt_vmstack r12, r12
+	tophys_novmstack r11, r11
 	mflr	r10
 	stw	r10, _LINK(r11)
 #ifdef CONFIG_VMAP_STACK
@@ -160,6 +150,9 @@
 #else
 	mfspr	r10,SPRN_SRR0
 #endif
+	stw	r1,GPR1(r11)
+	stw	r1,0(r11)
+	tovirt_novmstack r1, r11	/* set new kernel sp */
 	stw	r10,_NIP(r11)
 	mfcr	r10
 	rlwinm	r10,r10,0,4,2	/* Clear SO bit in CR */

@@ -1751,9 +1751,8 @@ static void __ufshcd_release(struct ufs_hba *hba)
 
 	if (hba->clk_gating.active_reqs || hba->clk_gating.is_suspended ||
 	    hba->ufshcd_state != UFSHCD_STATE_OPERATIONAL ||
-	    hba->outstanding_tasks ||
-	    hba->active_uic_cmd || hba->uic_async_done ||
-	    hba->clk_gating.state == CLKS_OFF)
+	    ufshcd_any_tag_in_use(hba) || hba->outstanding_tasks ||
+	    hba->active_uic_cmd || hba->uic_async_done)
 		return;
 
 	hba->clk_gating.state = REQ_CLKS_OFF;

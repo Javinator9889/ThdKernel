@@ -162,8 +162,7 @@ EXPORT_SYMBOL_GPL(mce_log);
 
 void mce_register_decode_chain(struct notifier_block *nb)
 {
-	if (WARN_ON(nb->priority < MCE_PRIO_LOWEST ||
-		    nb->priority > MCE_PRIO_HIGHEST))
+	if (WARN_ON(nb->priority > MCE_PRIO_MCELOG && nb->priority < MCE_PRIO_EDAC))
 		return;
 
 	blocking_notifier_chain_register(&x86_mce_decoder_chain, nb);

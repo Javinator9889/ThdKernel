@@ -58,22 +58,20 @@ int BPF_PROG(unlink_hook, struct inode *dir, struct dentry *victim)
 {
 	__u32 pid = bpf_get_current_pid_tgid() >> 32;
 	struct dummy_storage *storage;
-	int err;
 
 	if (pid != monitored_pid)
 		return 0;
 
 	storage = bpf_inode_storage_get(&inode_storage_map, victim->d_inode, 0,
-					BPF_LOCAL_STORAGE_GET_F_CREATE);
+				     BPF_SK_STORAGE_GET_F_CREATE);
 	if (!storage)
 		return 0;
 
-	if (storage->value != DUMMY_STORAGE_VALUE)
+	if (storage->value == DUMMY_STORAGE_VALUE)
 		inode_storage_result = -1;
 
-	err = bpf_inode_storage_delete(&inode_storage_map, victim->d_inode);
-	if (!err)
-		inode_storage_result = err;
+	inode_storage_result =
+		bpf_inode_storage_delete(&inode_storage_map, victim->d_inode);
 
 	return 0;
 }
@@ -84,23 +82,19 @@ int BPF_PROG(socket_bind, struct socket *sock, struct sockaddr *address,
 {
 	__u32 pid = bpf_get_current_pid_tgid() >> 32;
 	struct dummy_storage *storage;
-	int err;
 
 	if (pid != monitored_pid)
 		return 0;
 
 	storage = bpf_sk_storage_get(&sk_storage_map, sock->sk, 0,
-				     BPF_LOCAL_STORAGE_GET_F_CREATE);
+				     BPF_SK_STORAGE_GET_F_CREATE);
 	if (!storage)
 		return 0;
 
-	if (storage->value != DUMMY_STORAGE_VALUE)
+	if (storage->value == DUMMY_STORAGE_VALUE)
 		sk_storage_result = -1;
 
-	err = bpf_sk_storage_delete(&sk_storage_map, sock->sk);
-	if (!err)
-		sk_storage_result = err;
-
+	sk_storage_result = bpf_sk_storage_delete(&sk_storage_map, sock->sk);
 	return 0;
 }
 
@@ -115,7 +109,7 @@ int BPF_PROG(socket_post_create, struct socket *sock, int family, int type,
 		return 0;
 
 	storage = bpf_sk_storage_get(&sk_storage_map, sock->sk, 0,
-				     BPF_LOCAL_STORAGE_GET_F_CREATE);
+				     BPF_SK_STORAGE_GET_F_CREATE);
 	if (!storage)
 		return 0;
 
@@ -137,7 +131,7 @@ int BPF_PROG(file_open, struct file *file)
 		return 0;
 
 	storage = bpf_inode_storage_get(&inode_storage_map, file->f_inode, 0,
-					BPF_LOCAL_STORAGE_GET_F_CREATE);
+				     BPF_LOCAL_STORAGE_GET_F_CREATE);
 	if (!storage)
 		return 0;
 

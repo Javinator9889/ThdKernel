@@ -116,7 +116,7 @@
 		/*
 		 * Debug print of the final appended DTB location
 		 */
-		.macro dbgadtb, begin, size
+		.macro dbgadtb, begin, end
 #ifdef DEBUG
 		kputc   #'D'
 		kputc   #'T'
@@ -129,7 +129,7 @@
 		kputc	#'('
 		kputc	#'0'
 		kputc	#'x'
-		kphex	\size, 8	/* Size of appended DTB */
+		kphex	\end, 8		/* End of appended DTB */
 		kputc	#')'
 		kputc	#'\n'
 #endif

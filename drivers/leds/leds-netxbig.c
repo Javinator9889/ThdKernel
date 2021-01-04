@@ -448,39 +448,31 @@ static int netxbig_leds_get_of_pdata(struct device *dev,
 	gpio_ext = devm_kzalloc(dev, sizeof(*gpio_ext), GFP_KERNEL);
 	if (!gpio_ext) {
 		of_node_put(gpio_ext_np);
-		ret = -ENOMEM;
-		goto put_device;
+		return -ENOMEM;
 	}
 	ret = netxbig_gpio_ext_get(dev, gpio_ext_dev, gpio_ext);
 	of_node_put(gpio_ext_np);
 	if (ret)
-		goto put_device;
+		return ret;
 	pdata->gpio_ext = gpio_ext;
 
 	/* Timers (optional) */
 	ret = of_property_count_u32_elems(np, "timers");
 	if (ret > 0) {
-		if (ret % 3) {
-			ret = -EINVAL;
-			goto put_device;
-		}
-
+		if (ret % 3)
+			return -EINVAL;
 		num_timers = ret / 3;
 		timers = devm_kcalloc(dev, num_timers, sizeof(*timers),
 				      GFP_KERNEL);
-		if (!timers) {
-			ret = -ENOMEM;
-			goto put_device;
-		}
+		if (!timers)
+			return -ENOMEM;
 		for (i = 0; i < num_timers; i++) {
 			u32 tmp;
 
 			of_property_read_u32_index(np, "timers", 3 * i,
 						   &timers[i].mode);
-			if (timers[i].mode >= NETXBIG_LED_MODE_NUM) {
-				ret = -EINVAL;
-				goto put_device;
-			}
+			if (timers[i].mode >= NETXBIG_LED_MODE_NUM)
+				return -EINVAL;
 			of_property_read_u32_index(np, "timers",
 						   3 * i + 1, &tmp);
 			timers[i].delay_on = tmp;
@@ -496,15 +488,12 @@ static int netxbig_leds_get_of_pdata(struct device *dev,
 	num_leds = of_get_available_child_count(np);
 	if (!num_leds) {
 		dev_err(dev, "No LED subnodes found in DT\n");
-		ret = -ENODEV;
-		goto put_device;
+		return -ENODEV;
 	}
 
 	leds = devm_kcalloc(dev, num_leds, sizeof(*leds), GFP_KERNEL);
-	if (!leds) {
-		ret = -ENOMEM;
-		goto put_device;
-	}
+	if (!leds)
+		return -ENOMEM;
 
 	led = leds;
 	for_each_available_child_of_node(np, child) {
@@ -585,8 +574,6 @@ static int netxbig_leds_get_of_pdata(struct device *dev,
 
 err_node_put:
 	of_node_put(child);
-put_device:
-	put_device(gpio_ext_dev);
 	return ret;
 }
 
