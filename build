@@ -48,8 +48,8 @@ if [ ! "$RT" -eq 0 ]; then
 fi
 echo "Creating tools package..."
 cd tools/
-make cpupower intel-speed-select pci perf bootconfig tmon usb x86_energy_perf_policy
-sudo checkinstall -D --pkgname "linux-tools-thdkernel-${KV}" --pkgversion "${KV}" --pakdir .. --gzman -y --install=no --maintainer dev@javinator9889.com --exclude /root --exclude /media make cpupower_install intel-speed-select_install pci_install perf_install bootconfig_install tmon_install usb_install x86_energy_perf_policy_install
+make cpupower intel-speed-select pci bootconfig tmon usb x86_energy_perf_policy wmi freefall
+sudo checkinstall -D --pkgname "linux-tools-thdkernel-${KV}" --pkgversion "${KV}" --pakdir .. --gzman -y --install=no --maintainer dev@javinator9889.com --exclude /root --exclude /media make cpupower_install intel-speed-select_install pci_install bootconfig_install tmon_install usb_install x86_energy_perf_policy_install wmi_install freefall_install
 cd ..
 sudo chown $USER:$USER *.deb
 
