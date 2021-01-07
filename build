@@ -18,12 +18,7 @@ CCXXFLAGS="$CFLAGS"
 CC="/usr/bin/gcc $CCFLAGS"
 CXX="/usr/bin/g++ $CCFLAGS"
 HOSTCC=$CC
-# pyenv specific data
-export PYTHON_CFLAGS="$CFLAGS"
 # end of compilation options
-
-# make with options defined above
-alias make="/usr/bin/make $MAKE_OPTS CC='$CC' CXX='$CXX'"
 
 echo "Preparing for compiling kernel ThdKernel-${KV}..."
 
@@ -50,6 +45,7 @@ echo "Creating tools package..."
 cd tools/
 make cpupower intel-speed-select pci bootconfig tmon usb x86_energy_perf_policy wmi freefall
 sudo checkinstall -D --pkgname "linux-tools-thdkernel-${KV}" --pkgversion "${KV}" --pakdir .. --gzman -y --install=no --maintainer dev@javinator9889.com --exclude /root --exclude /media make cpupower_install intel-speed-select_install pci_install bootconfig_install tmon_install usb_install x86_energy_perf_policy_install wmi_install freefall_install
+make clean
 cd ..
 sudo chown $USER:$USER *.deb
 
