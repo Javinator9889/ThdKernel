@@ -12,18 +12,17 @@ echo "                                                ";
 
 KERNEL_CONFIG="thdkernel-latest_defconfig"
 KV=$(make kernelversion)
-MAKE_OPTS="-j$(nproc --all)"
+if [ -z "$@" ]; then
+    MAKE_OPTS="-j$(nproc --all)"
+else
+    MAKE_OPTS="$@"
+fi
 CCFLAGS="-march=skylake -mtune=skylake -O2 -pipe -msse -msse2 -msse3 -mmmx -m3dnow"
 CCXXFLAGS="$CFLAGS"
 CC="/usr/bin/gcc $CCFLAGS"
 CXX="/usr/bin/g++ $CCFLAGS"
 HOSTCC=$CC
-# pyenv specific data
-export PYTHON_CFLAGS="$CFLAGS"
 # end of compilation options
-
-# make with options defined above
-alias make="/usr/bin/make $MAKE_OPTS CC='$CC' CXX='$CXX'"
 
 echo "Preparing for compiling kernel ThdKernel-${KV}..."
 
@@ -48,8 +47,9 @@ if [ ! "$RT" -eq 0 ]; then
 fi
 echo "Creating tools package..."
 cd tools/
-make cpupower intel-speed-select pci bootconfig tmon usb x86_energy_perf_policy wmi freefall
-sudo checkinstall -D --pkgname "linux-tools-thdkernel-${KV}" --pkgversion "${KV}" --pakdir .. --gzman -y --install=no --maintainer dev@javinator9889.com --exclude /root --exclude /media make cpupower_install intel-speed-select_install pci_install bootconfig_install tmon_install usb_install x86_energy_perf_policy_install wmi_install freefall_install
+make cpupower intel-speed-select pci bootconfig tmon usb x86_energy_perf_policy wmi freefall perf
+sudo checkinstall -D --pkgname "linux-tools-thdkernel-${KV}" --pkgversion "${KV}" --pakdir .. --gzman -y --install=no --maintainer dev@javinator9889.com --exclude /root --exclude /media make cpupower_install intel-speed-select_install pci_install bootconfig_install tmon_install usb_install x86_energy_perf_policy_install wmi_install freefall_install perf_install
+make clean
 cd ..
 sudo chown $USER:$USER *.deb
 
