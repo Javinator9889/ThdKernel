@@ -163,6 +163,24 @@ static int rn_acp_deinit(void __iomem *acp_base)
 	return 0;
 }
 
+static const struct dmi_system_id rn_acp_quirk_table[] = {
+	{
+		/* Lenovo IdeaPad Flex 5 14ARE05, IdeaPad 5 15ARE05 */
+		.matches = {
+			DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
+			DMI_EXACT_MATCH(DMI_BOARD_NAME, "LNVNB161216"),
+		}
+	},
+	{
+		/* Lenovo ThinkPad X395 */
+		.matches = {
+			DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
+			DMI_EXACT_MATCH(DMI_BOARD_NAME, "20NLCTO1WW"),
+		}
+	},
+	{}
+};
+
 static int snd_rn_acp_probe(struct pci_dev *pci,
 			    const struct pci_device_id *pci_id)
 {
