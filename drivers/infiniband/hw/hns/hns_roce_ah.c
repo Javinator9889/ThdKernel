@@ -35,9 +35,9 @@
 #include <rdma/ib_cache.h>
 #include "hns_roce_device.h"
 
-#define HNS_ROCE_PORT_NUM_SHIFT		24
-#define HNS_ROCE_VLAN_SL_BIT_MASK	7
-#define HNS_ROCE_VLAN_SL_SHIFT		13
+#define HNS_ROCE_PORT_NUM_SHIFT 24
+#define HNS_ROCE_VLAN_SL_BIT_MASK 7
+#define HNS_ROCE_VLAN_SL_SHIFT 13
 
 static inline u16 get_ah_udp_sport(const struct rdma_ah_attr *ah_attr)
 {
@@ -46,8 +46,8 @@ static inline u16 get_ah_udp_sport(const struct rdma_ah_attr *ah_attr)
 
 	if (!fl)
 		sport = get_random_u32() %
-			(IB_ROCE_UDP_ENCAP_VALID_PORT_MAX + 1 -
-			 IB_ROCE_UDP_ENCAP_VALID_PORT_MIN) +
+				(IB_ROCE_UDP_ENCAP_VALID_PORT_MAX + 1 -
+				 IB_ROCE_UDP_ENCAP_VALID_PORT_MIN) +
 			IB_ROCE_UDP_ENCAP_VALID_PORT_MIN;
 	else
 		sport = rdma_flow_label_to_udp_sport(fl);
@@ -78,9 +78,8 @@ int hns_roce_create_ah(struct ib_ah *ibah, struct rdma_ah_init_attr *init_attr,
 
 	if (vlan_id < VLAN_N_VID) {
 		vlan_en = true;
-		vlan_id |= (rdma_ah_get_sl(ah_attr) &
-			     HNS_ROCE_VLAN_SL_BIT_MASK) <<
-			     HNS_ROCE_VLAN_SL_SHIFT;
+		vlan_id |= (rdma_ah_get_sl(ah_attr) & HNS_ROCE_VLAN_SL_BIT_MASK)
+			   << HNS_ROCE_VLAN_SL_SHIFT;
 	}
 
 	ah->av.port = rdma_ah_get_port_num(ah_attr);
@@ -98,7 +97,17 @@ int hns_roce_create_ah(struct ib_ah *ibah, struct rdma_ah_init_attr *init_attr,
 	ah->av.flowlabel = grh->flow_label;
 	ah->av.udp_sport = get_ah_udp_sport(ah_attr);
 
-	return 0;
+	/* HIP08 needs to record vlan info in Address Vector */
+	if (hr_dev->pci_dev->revision <= PCI_REVISION_ID_HIP08) {
+		ret = rdma_read_gid_l2_fields(ah_attr->grh.sgid_attr,
+					      &ah->av.vlan_id, NULL);
+		if (ret)
+			return ret;
+
+		ah->av.vlan_en = ah->av.vlan_id < VLAN_N_VID;
+	}
+
+	return ret;
 }
 
 int hns_roce_query_ah(struct ib_ah *ibah, struct rdma_ah_attr *ah_attr)
@@ -110,8 +119,8 @@ int hns_roce_query_ah(struct ib_ah *ibah, struct rdma_ah_attr *ah_attr)
 	rdma_ah_set_sl(ah_attr, ah->av.sl);
 	rdma_ah_set_port_num(ah_attr, ah->av.port);
 	rdma_ah_set_static_rate(ah_attr, ah->av.stat_rate);
-	rdma_ah_set_grh(ah_attr, NULL, ah->av.flowlabel,
-			ah->av.gid_index, ah->av.hop_limit, ah->av.tclass);
+	rdma_ah_set_grh(ah_attr, NULL, ah->av.flowlabel, ah->av.gid_index,
+			ah->av.hop_limit, ah->av.tclass);
 	rdma_ah_set_dgid_raw(ah_attr, ah->av.dgid);
 
 	return 0;
