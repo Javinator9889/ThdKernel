@@ -9331,7 +9331,7 @@ static struct file *io_uring_get_file(struct io_ring_ctx *ctx)
 	ret = sock_create_kern(&init_net, PF_UNIX, SOCK_RAW, IPPROTO_IP,
 				&ctx->ring_sock);
 	if (ret)
-		return ERR_PTR(err);
+		return ERR_PTR(ret);
 #endif
 
 	file = anon_inode_getfile("[io_uring]", &io_uring_fops, ctx,
