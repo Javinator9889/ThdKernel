@@ -8642,7 +8642,8 @@ static void io_cancel_defer_files(struct io_ring_ctx *ctx,
  * Returns true if we found and killed one or more files pinning requests
  */
 static bool io_uring_cancel_files(struct io_ring_ctx *ctx,
-				  struct files_struct *files)
+								  struct task_struct *task,
+				  				  struct files_struct *files)
 {
 	if (list_empty_careful(&ctx->inflight_list))
 		return false;
@@ -8696,12 +8697,12 @@ static bool io_cancel_task_cb(struct io_wq_work *work, void *data)
 }
 
 static bool __io_uring_cancel_task_requests(struct io_ring_ctx *ctx,
-					    struct task_struct *task,
-					    struct files_struct *files)
+					    					struct task_struct *task,
+					    					struct files_struct *files)
 {
 	bool ret;
 
-	ret = io_uring_cancel_files(ctx, files);
+	ret = io_uring_cancel_files(ctx, task, files);
 	if (!files) {
 		enum io_wq_cancel cret;
 
@@ -9354,6 +9355,7 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p,
 {
 	struct user_struct *user = NULL;
 	struct io_ring_ctx *ctx;
+	struct file *file;
 	bool limit_mem;
 	int ret;
 
@@ -9499,6 +9501,14 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p,
 		ret = -EFAULT;
 		goto err;
 	}
+
+	file = io_uring_get_file(ctx);
+	if (IS_ERR(file))
+	{
+		ret = PTR_ERR(file);
+		goto err;
+	}
+	
 
 	/*
 	 * Install ring fd as the very last thing, so we don't risk someone
